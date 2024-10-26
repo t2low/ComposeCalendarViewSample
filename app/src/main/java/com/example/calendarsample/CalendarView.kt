@@ -1,8 +1,12 @@
 package com.example.calendarsample
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Text
@@ -175,6 +179,51 @@ fun CalendarView(
         )
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DayPager(
+    state: CalendarState,
+    pageContent: @Composable (LocalDate) -> Unit,
+) {
+    HorizontalPager(
+        state = state.dayPagerState,
+        modifier = Modifier
+            .fillMaxWidth(),
+        pageContent = { page ->
+            val date = state.getDate(dayNumber = page.toLong())
+            pageContent(date)
+        }
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun WeekPager(
+    state: CalendarState,
+    dayOfWeekContent: @Composable (LocalDate, Boolean) -> Unit,
+) {
+    HorizontalPager(
+        state = state.weekPagerState,
+        modifier = Modifier
+            .fillMaxWidth(),
+        pageContent = { page ->
+            val week = state.getWeek(weekNumber = page.toLong())
+            Row {
+                week.forEach { day ->
+                    val isSelected = (day == state.currentDate)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        dayOfWeekContent(day, isSelected)
+                    }
+                }
+            }
+        }
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable
